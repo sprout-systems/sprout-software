@@ -1,24 +1,26 @@
-#include "../include/DHT.h"
+#include "../include/SensorDHT.h"
 
 DHT dht(DHTPIN, DHTTYPE);
 
-void DHT_Task(void *pvParameters) {  
+float temperature = 0;
+float humidity = 0;
+
+void ReadDHT_Task(void *pvParameters) {  
   dht.begin();
   Serial.begin(115200);
 
   while (1) {
-    float temp = dht.readTemperature();
-    float hum = dht.readHumidity();
+    temperature = dht.readTemperature();
+    humidity = dht.readHumidity();
 
-    if (isnan(temp) || isnan(hum)) {
+    if (isnan(temperature) || isnan(humidity)) {
       Serial.println("Failed to read from DHT sensor!");
     } else {
       Serial.print("Temperature: ");
-      Serial.print(temp);
+      Serial.print(temperature);
       Serial.print(" °C, Humidity: ");
-      Serial.print(hum);
+      Serial.print(humidity);
       Serial.println(" %");
-      Serial.println(uxTaskGetStackHighWaterMark(NULL));
     }
     vTaskDelay(pdMS_TO_TICKS(2000)); 
   }
