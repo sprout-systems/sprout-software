@@ -3,6 +3,7 @@
 #include <ArduinoJson.h>
 #include "include/SensorDHT.h"
 #include "include/SensorPH.h"
+//#include "include/LCDDisplay.h"
 
 const char *ssid = "PANACKAL";
 const char *password = "arungeorge@295";
@@ -45,4 +46,5 @@ void setup() {
 
 void loop() {
     server.handleClient();
+    //LCD_Display(temperature, humidity, phValue); 
 }

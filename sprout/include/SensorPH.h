@@ -5,6 +5,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+//https://adiy.in/shop/ph-sensor-module-with-ph-probe/?srsltid=AfmBOoqSywxQt5d4BLzf7yZyjeVPPq1E3dZPVNfRSS9YeZorFWx3eKjU
 #define PHSensor 32 
 
 extern float phValue;
