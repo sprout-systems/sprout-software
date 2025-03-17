@@ -5,8 +5,8 @@
 #include "include/SensorPH.h"
 //#include "include/LCDDisplay.h"
 
-const char *ssid = "PANACKAL";
-const char *password = "arungeorge@295";
+const char *ssid = "honor1";
+const char *password = "";
 
 WebServer server(80);
 
