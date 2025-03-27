@@ -3,9 +3,23 @@
 #include <ArduinoJson.h>
 #include "include/SensorDHT.h"
 #include "include/SensorPH.h"
-//#include "include/LCDDisplay.h"
+#include "include/LCDDisplay.h"+
+#include "include/MotorDriver.h"
 
-const char *ssid = "honor1";
+float desiredTemperature = 25;
+
+SensorPointers sensorPtrs = {
+    &temperature,
+    &humidity,
+    &phValue
+};
+
+temperaturePointers temperaturePtrs  = {
+    &desiredTemperature,
+    &temperature
+};
+
+const char *ssid = "honor";
 const char *password = "";
 
 WebServer server(80);
@@ -15,12 +29,12 @@ void handleSensorData() {
     data["temperature"] = temperature;
     data["humidity"] = humidity;
     data["ph"] = phValue;
-    
+
     String response;
     serializeJson(data, response);
     
     server.send(200, "application/json", response);
-}
+} 
 
 void setup() {
     Serial.begin(9600);
@@ -40,11 +54,14 @@ void setup() {
     server.on("/sensor", HTTP_GET, handleSensorData);
     server.begin();
 
+    fanOn();
+
     xTaskCreate(ReadDHT_Task, "DHT11", 4096, NULL, 1, NULL);
     xTaskCreate(ReadPH_Task, "PH", 4096, NULL, 1, NULL);
+    xTaskCreate(LCD_Display, "LCD", 4096, &sensorPtrs, 1, NULL);
+    xTaskCreate(temperatureControl, "MotorDriver", 4096, &temperaturePtrs, 1, NULL);
 }
 
 void loop() {
     server.handleClient();
-    //LCD_Display(temperature, humidity, phValue); 
 }

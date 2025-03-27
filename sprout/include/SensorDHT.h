@@ -6,7 +6,7 @@
 #include <freertos/task.h>
 #include "DHT.h"
 
-#define DHTPIN 23 
+#define DHTPIN 26   
 #define DHTTYPE DHT11
 
 extern float humidity;

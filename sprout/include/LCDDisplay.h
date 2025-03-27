@@ -2,6 +2,8 @@
 #define LCD_DISPLAY_H
 
 #include <Arduino.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <LiquidCrystal.h>
 
 //VCC -> 3.3V or 5v 
@@ -14,6 +16,7 @@
 //D6 -> 21
 //D7 -> 5 
 //A -> 3.3V or 5v
+//K -> GND
 #define RS_PIN 18
 #define E_PIN 19
 #define D4_PIN 25
@@ -23,8 +26,15 @@
 
 extern LiquidCrystal lcd;
 
+typedef struct {
+    float* temperature;
+    float* humidity;
+    float* phValue;
+} SensorPointers;
+
 void initLCD();
 void displayText(const String &text, uint8_t row, uint8_t col);
 void clearLCD();
+void LCD_Display(void *pvParameters);
 
 #endif 
