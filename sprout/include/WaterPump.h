@@ -12,6 +12,6 @@
 //no -> pump(+)
 //gnd -> pump(-)
 
-void pumpWater(void *pvParameters);
+void pumpWater();
  
 #endif

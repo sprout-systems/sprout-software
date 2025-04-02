@@ -5,7 +5,7 @@ void initializeWaterPump() {
   digitalWrite(WaterPump, LOW);
 }
 
-void pumpWater(void *pvParameters) {
+void pumpWater() {
   Serial.println("Turning ON Pump");  
   digitalWrite(WaterPump, HIGH);
 
