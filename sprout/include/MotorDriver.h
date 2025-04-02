@@ -5,10 +5,8 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#define ENA   12
 #define IN1   13
 #define IN2   14
-#define ENB   27
 #define IN3   33
 #define IN4   15
 

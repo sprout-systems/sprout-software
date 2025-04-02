@@ -3,7 +3,7 @@
 #include <ArduinoJson.h>
 #include "include/SensorDHT.h"
 #include "include/SensorPH.h"
-#include "include/LCDDisplay.h"+
+#include "include/LCDDisplay.h"
 #include "include/MotorDriver.h"
 
 float desiredTemperature = 25;
@@ -50,14 +50,15 @@ void setup() {
     Serial.print("ESP32 IP Address: ");
     Serial.println(WiFi.localIP());
 
-
     server.on("/sensor", HTTP_GET, handleSensorData);
     server.begin();
 
+    initializeMotorDriver();
+    initializeWaterPump();
     fanOn();
 
-    xTaskCreate(ReadDHT_Task, "DHT11", 4096, NULL, 1, NULL);
-    xTaskCreate(ReadPH_Task, "PH", 4096, NULL, 1, NULL);
+    xTaskCreate(ReadDHT_Task, "DHT11", 2048, NULL, 1, NULL);
+    xTaskCreate(ReadPH_Task, "PH", 2048, NULL, 1, NULL);
     xTaskCreate(LCD_Display, "LCD", 4096, &sensorPtrs, 1, NULL);
     xTaskCreate(temperatureControl, "MotorDriver", 4096, &temperaturePtrs, 1, NULL);
 }

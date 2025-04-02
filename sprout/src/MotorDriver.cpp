@@ -1,17 +1,13 @@
 #include "../include/MotorDriver.h"
 
 void initializeMotorDriver() {
-    pinMode(ENA, OUTPUT);
     pinMode(IN1, OUTPUT);
     pinMode(IN2, OUTPUT);
-    pinMode(ENB, OUTPUT);
     pinMode(IN3, OUTPUT);
     pinMode(IN4, OUTPUT);
 
-    digitalWrite(ENA, LOW);
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, LOW);
-    digitalWrite(ENB, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, LOW);
 }
@@ -19,35 +15,47 @@ void initializeMotorDriver() {
 void peltierCooling() {
     digitalWrite(IN1, HIGH);
     digitalWrite(IN2, LOW);
-    digitalWrite(ENA, HIGH);
 }
 
 void peltierHeating() {
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, HIGH);
-    digitalWrite(ENA, HIGH);
 }
 
 void peltierOff() {
-    digitalWrite(ENA, LOW);
+    digitalWrite(IN1, LOW);
+    digitalWrite(IN2, LOW);
 }
 
 void fanOn() {
-    digitalWrite(IN3, HIGH);
-    digitalWrite(IN4, LOW);
-    digitalWrite(ENB, HIGH);
+    digitalWrite(IN3, LOW);
+    digitalWrite(IN4, HIGH);
 }
 
-void temperatureControl(void* pvParameters){
+void temperatureControl(void* pvParameters) {
     temperaturePointers* temperature = (temperaturePointers*)pvParameters;
 
-    while(1){
-        if(*temperature->currentTemperature < *temperature->desiredTemperature){
+    while (1) {
+        float* currentTemp = temperature ? temperature->currentTemperature : nullptr;
+        float* desiredTemp = temperature ? temperature->desiredTemperature : nullptr;
+
+        if (!currentTemp || !desiredTemp) {
+            Serial.println("Temperature pointers not set");
+            vTaskDelay(1000 / portTICK_PERIOD_MS);  
+            continue;
+        }
+
+        if (*currentTemp - 0.5 > *desiredTemp) {
             peltierCooling();
-        } else if(*temperature->currentTemperature > *temperature->desiredTemperature){
+            Serial.println("Cooling");
+        } else if (*currentTemp + 0.5 < *desiredTemp) {
             peltierHeating();
+            Serial.println("Heating");
         } else {
             peltierOff();
+            Serial.println("Off");
         }
+
+        vTaskDelay(100 / portTICK_PERIOD_MS);  
     }
 }

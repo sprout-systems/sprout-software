@@ -4,25 +4,13 @@
 #include <Arduino.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <LiquidCrystal.h>
+#include <Wire.h>  
+#include <LiquidCrystal_I2C.h>
 
-//VCC -> 3.3V or 5v 
-//VSS -> GND
-//RS -> 18
-//RW -> GND
-//E -> 19
-//D4 -> 25
-//D5 -> 22
-//D6 -> 21
-//D7 -> 5 
-//A -> 3.3V or 5v
-//K -> GND
-#define RS_PIN 18
-#define E_PIN 19
-#define D4_PIN 25
-#define D5_PIN 22
-#define D6_PIN 21
-#define D7_PIN 5
+#define LCD_I2C_ADDRESS 0x27
+//#define LCD_I2C_ADDRESS 0x3F
+//SDL - 21 
+//SCL - 22
 
 extern LiquidCrystal lcd;
 

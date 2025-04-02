@@ -1,6 +1,6 @@
 #include "../include/LCDDisplay.h"
 
-LiquidCrystal lcd(RS_PIN, E_PIN, D4_PIN, D5_PIN, D6_PIN, D7_PIN);
+LiquidCrystal_I2C lcd(LCD_I2C_ADDRESS, 16, 2);
 
 void initLCD() {
   lcd.begin(16, 2);  
