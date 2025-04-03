@@ -6,9 +6,11 @@
 #include "include/LCDDisplay.h"
 #include "include/MotorDriver.h"
 #include "include/WaterPump.h"
+#include "include/LEDLights.h"
 
 float desiredTemperature = 25;
 bool shouldPumpWater = false; 
+bool shouldLight = false; 
 
 SensorPointers sensorPtrs = {
     &temperature,
@@ -33,6 +35,7 @@ void handleSensorData() {
     data["ph"] = phValue;
     data["desiredTemp"] = desiredTemperature;
     data["pumpStatus"] = shouldPumpWater;
+    data["lightStatus"] = shouldLight;
 
     String response;
     serializeJson(data, response);
@@ -50,17 +53,27 @@ void handleCommand(void *pvParameters) {
             Serial.print("New desired temperature set: ");
             Serial.println(desiredTemperature);
         }
-        
-        if (doc.containsKey("pumpWater")) {
-            shouldPumpWater = doc["pumpWater"];
+       
+        if (doc.containsKey("LEDStatus")) {
+            shouldLight = doc["LEDStatus"];
+            Serial.print("LED command: ");
+            Serial.println(shouldPumpWater ? "ON" : "OFF");
+            
+            if (shouldLight) {
+                OnLED();
+            }else {
+                OffLED();
+            }
+        }
+
+        if (doc.containsKey("pumpStatus")) {
+            shouldPumpWater = doc["pumpStatus"];
             Serial.print("Water pump command: ");
             Serial.println(shouldPumpWater ? "ON" : "OFF");
             
             if (shouldPumpWater) {
                 pumpWater();
-                while (!shouldPumpWater) {
-                    vTaskDelay(pdMS_TO_TICKS(5000)); 
-                }
+                vTaskDelay(pdMS_TO_TICKS(5000)); 
             }
         }
         server.send(200, "application/json", "{\"status\":\"success\"}");
@@ -89,6 +102,7 @@ void setup() {
 
     initializeMotorDriver();
     initializeWaterPump();
+    initializeLED();
     fanOn();
 
     xTaskCreate(handleCommand, "handleCommand", 2048, NULL, 1, NULL);

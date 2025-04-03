@@ -12,6 +12,7 @@
 //no -> pump(+)
 //gnd -> pump(-)
 
+void initializeWaterPump();
 void pumpWater();
  
 #endif
