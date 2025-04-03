@@ -1,86 +1,10 @@
 #include <WiFi.h>
-#include <WebServer.h>
-#include <ArduinoJson.h>
-#include "include/SensorDHT.h"
-#include "include/SensorPH.h"
-#include "include/LCDDisplay.h"
+#include "include/WebServerHandler.h"
 #include "include/MotorDriver.h"
-#include "include/WaterPump.h"
-#include "include/LEDLights.h"
-
-float desiredTemperature = 25;
-bool shouldPumpWater = false; 
-bool shouldLight = false; 
-
-SensorPointers sensorPtrs = {
-    &temperature,
-    &humidity,
-    &phValue
-};
-
-temperaturePointers temperaturePtrs  = {
-    &desiredTemperature,
-    &temperature
-};
+#include "include/LCDDisplay.h"
 
 const char *ssid = "honor";
 const char *password = "";
-
-WebServer server(80);
-
-void handleSensorData() {
-    JsonDocument data;
-    data["temperature"] = temperature;
-    data["humidity"] = humidity;
-    data["ph"] = phValue;
-    data["desiredTemp"] = desiredTemperature;
-    data["pumpStatus"] = shouldPumpWater;
-    data["lightStatus"] = shouldLight;
-
-    String response;
-    serializeJson(data, response);
-    
-    server.send(200, "application/json", response);
-} 
-
-void handleCommand(void *pvParameters) {
-    if (server.hasArg("plain") {
-        JsonDocument doc;
-        deserializeJson(doc, server.arg("plain"));
-        
-        if (doc.containsKey("desiredTemp")) {
-            desiredTemperature = doc["desiredTemp"];
-            Serial.print("New desired temperature set: ");
-            Serial.println(desiredTemperature);
-        }
-       
-        if (doc.containsKey("LEDStatus")) {
-            shouldLight = doc["LEDStatus"];
-            Serial.print("LED command: ");
-            Serial.println(shouldPumpWater ? "ON" : "OFF");
-            
-            if (shouldLight) {
-                OnLED();
-            }else {
-                OffLED();
-            }
-        }
-
-        if (doc.containsKey("pumpStatus")) {
-            shouldPumpWater = doc["pumpStatus"];
-            Serial.print("Water pump command: ");
-            Serial.println(shouldPumpWater ? "ON" : "OFF");
-            
-            if (shouldPumpWater) {
-                pumpWater();
-                vTaskDelay(pdMS_TO_TICKS(5000)); 
-            }
-        }
-        server.send(200, "application/json", "{\"status\":\"success\"}");
-    } else {
-        server.send(400, "application/json", "{\"error\":\"No data received\"}");
-    }
-}
 
 void setup() {
     Serial.begin(9600);
@@ -96,20 +20,20 @@ void setup() {
     Serial.print("ESP32 IP Address: ");
     Serial.println(WiFi.localIP());
 
-    server.on("/sensor", HTTP_GET, handleSensorData);
-    server.on("/command", HTTP_POST, handleCommand);
-    server.begin();
+    setupWebServer();  
 
     initializeMotorDriver();
     initializeWaterPump();
     initializeLED();
     fanOn();
 
-    xTaskCreate(handleCommand, "handleCommand", 2048, NULL, 1, NULL);
+    xTaskCreate(desiredTemperatureSetTask, "desiredTemperatureSetTask", 2048, NULL, 1, NULL);
+    xTaskCreate(ledTask, "LEDToggleTask", 2048, NULL, 1, NULL);
+    xTaskCreate(pumpTask, "PumpControlTask", 2048, NULL, 1, NULL);
     xTaskCreate(ReadDHT_Task, "DHT11", 2048, NULL, 1, NULL);
     xTaskCreate(ReadPH_Task, "PH", 2048, NULL, 1, NULL);
-    xTaskCreate(LCD_Display, "LCD", 4096, &sensorPtrs, 1, NULL);
-    xTaskCreate(temperatureControl, "MotorDriver", 4096, &temperaturePtrs, 1, NULL);
+    xTaskCreate(LCD_Display, "LCD", 4096, NULL, 1, NULL);
+    xTaskCreate(temperatureControl, "MotorDriver", 4096, NULL, 1, NULL);
 }
 
 void loop() {
