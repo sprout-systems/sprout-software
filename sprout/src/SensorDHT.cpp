@@ -12,7 +12,7 @@ void ReadDHT_Task(void *pvParameters) {
   while (1) {
     temperature = dht.readTemperature();
     humidity = dht.readHumidity();
-
+    
     if (isnan(temperature) || isnan(humidity)) {
       Serial.println("Failed to read from DHT sensor!");
     } else {

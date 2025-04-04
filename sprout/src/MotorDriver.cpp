@@ -5,11 +5,17 @@ void initializeMotorDriver() {
     pinMode(IN2, OUTPUT);
     pinMode(IN3, OUTPUT);
     pinMode(IN4, OUTPUT);
+    pinMode(IN5, OUTPUT);
+    pinMode(IN6, OUTPUT);
 
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
     digitalWrite(IN4, LOW);
+    digitalWrite(IN5, LOW);
+    digitalWrite(IN6, LOW);
+    digitalWrite(IN7, LOW);
+    digitalWrite(IN8, LOW);
 }
 
 void peltierCooling() {
@@ -58,4 +64,34 @@ void temperatureControl(void* pvParameters) {
 
         vTaskDelay(100 / portTICK_PERIOD_MS);  
     }
+}
+
+void pumpOn() {
+    digitalWrite(IN5, HIGH);
+    digitalWrite(IN6, LOW);
+}
+
+void pumpOff() {
+    digitalWrite(IN5, LOW);
+    digitalWrite(IN6, LOW);
+}
+
+void pumpWater() {
+  Serial.println("Turning ON Pump");  
+  pumpOn();
+
+  vTaskDelay(pdMS_TO_TICKS(2000)); 
+
+  Serial.println("Turning OFF Pump");
+  pumpOff();
+}
+
+void LedOn() {
+    digitalWrite(IN7, LOW);
+    digitalWrite(IN8, HIGH);
+}
+
+void LedOff() {
+    digitalWrite(IN7, LOW);
+    digitalWrite(IN8, LOW);
 }
