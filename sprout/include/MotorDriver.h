@@ -11,9 +11,9 @@
 #define IN3   33
 #define IN4   15
 #define IN5   16
-#define IN6   33
+#define IN6   27
 #define IN7   4 
-#define IN8   13
+#define IN8   18
 
 typedef struct {
     float* desiredTemperature;
